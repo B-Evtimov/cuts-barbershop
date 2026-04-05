@@ -13,37 +13,37 @@ A full-stack barbershop appointment booking system built with **ASP.NET Core 8**
 ## 🖼️ Screenshots
 
 ### Home Page
-![Hero](screenshots/01_hero.png)
+![Hero](Screenshots/01_hero.png)
 
 ### Step 1 — Choose a Service
-![Services](screenshots/02_services.png)
+![Services](Screenshots/02_services.png)
 
 ### Step 2 — Choose a Barber
-![Barbers](screenshots/03_barbers.png)
+![Barbers](Screenshots/03_barbers.png)
 
 ### Step 3 — Pick a Time Slot
-![Time Slots](screenshots/04_timeslots.png)
+![Time Slots](Screenshots/04_timeslots.png)
 
 ### Step 4 — Enter Your Details
-![Details](screenshots/05_details.png)
+![Details](Screenshots/05_details.png)
 
 ### Booking Confirmed
-![Confirmed](screenshots/06_confirmed.png)
+![Confirmed](Screenshots/06_confirmed.png)
 
 ### Admin Panel — Login
-![Admin Login](screenshots/07_admin_login.png)
+![Admin Login](Screenshots/07_admin_login.png)
 
 ### Admin Panel — Schedule
-![Admin Schedule](screenshots/08_admin_schedule.png)
+![Admin Schedule](Screenshots/08_admin_schedule.png)
 
 ### Booking Detail Modal
-![Booking Modal](screenshots/10_admin_modal.png)
+![Booking Modal](Screenshots/10_admin_modal.png)
 
 ### Delete Confirmation
-![Delete Confirm](screenshots/11_admin_modal_confirm.png)
+![Delete Confirm](Screenshots/11_admin_modal_confirm.png)
 
 ### Blocked Days
-![Blocked Days](screenshots/09_admin_blocked.png)
+![Blocked Days](Screenshots/09_admin_blocked.png)
 
 ---
 
