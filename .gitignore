@@ -1,0 +1,12 @@
+bin/
+obj/
+publish/
+*.zip
+.vs/
+*.user
+.vscode/
+.idea/
+cuts.db
+cuts.db-shm
+cuts.db-wal
+appsettings.Development.json

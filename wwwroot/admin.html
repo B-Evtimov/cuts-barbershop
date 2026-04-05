@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CUTS — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--bg2:#0f0f0f;--bg3:#161616;--surface:#1c1c1c;
+  --border:#2a2a2a;--border-h:#3d3d3d;
+  --gold:#c9a84c;--gold-dim:rgba(201,168,76,0.10);--gold-glow:rgba(201,168,76,0.22);
+  --text:#f0ede8;--text2:#8a8680;--text3:#4a4845;
+  --danger:#e05353;--danger-dim:rgba(224,83,83,0.1);
+  --success:#4caf7d;--amber:#f0a030;--amber-dim:rgba(240,160,48,0.1);
+  --r:12px;--font-display:'Bebas Neue',sans-serif;--font:'DM Sans',sans-serif;
+  --expo:cubic-bezier(0.16,1,0.3,1);--sidebar:260px;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:300;font-size:15px;line-height:1.6;display:flex;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.35}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-h);border-radius:2px}
+
+#login-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.login-box{width:100%;max-width:420px;padding:0 24px;animation:fadeUp .7s var(--expo) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.login-logo{font-family:var(--font-display);font-size:52px;letter-spacing:8px;color:var(--gold);text-align:center;margin-bottom:8px}
+.login-sub{text-align:center;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--text3);margin-bottom:48px}
+.login-divider{height:1px;background:var(--border);margin-bottom:40px;position:relative}
+.login-divider::before{content:'LOGIN';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg);padding:0 16px;font-size:10px;letter-spacing:4px;color:var(--text3)}
+.login-field{margin-bottom:16px}
+.login-label{display:block;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.login-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:15px 18px;color:var(--text);font-family:var(--font);font-size:15px;font-weight:300;outline:none;transition:all .2s}
+.login-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.login-input::placeholder{color:var(--text3)}
+.login-btn{width:100%;margin-top:24px;padding:17px;background:var(--gold);border:none;border-radius:8px;color:#080808;font-family:var(--font);font-size:13px;letter-spacing:3px;text-transform:uppercase;font-weight:500;cursor:pointer;position:relative;overflow:hidden;transition:all .3s var(--expo)}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 20px 60px var(--gold-glow)}
+.login-btn.loading::after{content:'';display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.3);border-top-color:#080808;border-radius:50%;animation:spin .8s linear infinite;position:absolute;top:50%;right:20px;transform:translateY(-50%)}
+@keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}
+.login-error{text-align:center;font-size:12px;color:var(--danger);margin-top:12px;height:16px}
+.login-hint{text-align:center;font-size:11px;color:var(--text3);margin-top:20px}
+
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden}
+.sb-logo{padding:32px 28px 24px;border-bottom:1px solid var(--border)}
+.sb-logo-text{font-family:var(--font-display);font-size:28px;letter-spacing:6px;color:var(--gold)}
+.sb-logo-sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-top:2px}
+.sb-barber{padding:20px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.sb-avatar{width:40px;height:40px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sb-barber-name{font-size:14px;font-weight:400;color:var(--text)}
+.sb-barber-role{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.sb-nav{padding:20px 16px;flex:1}
+.sb-nav-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--text3);padding:0 12px;margin-bottom:8px;margin-top:16px}
+.sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:8px;color:var(--text2);font-size:13px;letter-spacing:1px;cursor:pointer;transition:all .2s;margin-bottom:2px;border:1px solid transparent}
+.sb-item:hover{background:var(--surface);color:var(--text)}
+.sb-item.active{background:var(--gold-dim);border-color:rgba(201,168,76,0.2);color:var(--gold)}
+.sb-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--gold);color:#080808;font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px}
+.sb-footer{padding:20px 28px;border-top:1px solid var(--border)}
+.logout-btn{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;background:none;color:var(--text2);font-family:var(--font);font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.logout-btn:hover{border-color:var(--danger);color:var(--danger)}
+.sidebar::after{content:'';position:absolute;top:0;left:0;width:2px;height:0;background:var(--gold);animation:sidebarLine 1s ease-out .5s forwards}
+@keyframes sidebarLine{to{height:100%}}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:60px;flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px}
+.topbar-title{font-family:var(--font-display);font-size:22px;letter-spacing:4px;color:var(--text)}
+.date-pill{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:12px;color:var(--text2);letter-spacing:1px}
+
+.view{display:none;flex:1;overflow-y:auto;padding:32px}
+.view.active{display:block;animation:fadeUp .4s var(--expo) both}
+
+.schedule-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.sch-controls{display:flex;align-items:center;gap:12px}
+.sch-date-nav{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.sch-nav-btn{width:36px;height:36px;border:none;background:none;color:var(--text2);cursor:pointer;font-size:15px;transition:all .2s}
+.sch-nav-btn:hover{background:var(--bg3);color:var(--text)}
+.sch-date-label{font-size:13px;color:var(--text);padding:0 16px;min-width:160px;text-align:center}
+.block-day-btn{padding:9px 20px;border-radius:8px;border:1px solid var(--amber);background:var(--amber-dim);color:var(--amber);font-family:var(--font);font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.block-day-btn:hover{background:var(--amber);color:#080808}
+.block-day-btn.blocked{border-color:var(--danger);background:var(--danger-dim);color:var(--danger)}
+.block-day-btn.blocked:hover{background:var(--danger);color:#fff}
+
+.timeline{display:flex;flex-direction:column;gap:8px}
+.time-row{display:flex;align-items:stretch;gap:12px;min-height:52px;animation:rowIn .3s var(--expo) both}
+@keyframes rowIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.time-label{width:64px;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;font-size:12px;color:var(--text3);padding-right:12px;font-variant-numeric:tabular-nums}
+.time-line{flex:1;border:1px solid var(--border);border-radius:8px;background:var(--bg3);min-height:52px;display:flex;align-items:center;padding:0 16px;position:relative;overflow:hidden;transition:all .2s}
+.time-line:hover{border-color:var(--border-h)}
+.time-line.has-booking{border-color:rgba(201,168,76,0.3);background:var(--gold-dim);cursor:pointer}
+.time-line.has-booking:hover{border-color:var(--gold);box-shadow:0 4px 24px var(--gold-dim)}
+.time-line.blocked{background:rgba(224,83,83,0.04);border-color:rgba(224,83,83,0.15);cursor:not-allowed}
+.time-line.blocked::after{content:'Blocked';position:absolute;right:16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--danger);opacity:.6}
+.booking-chip{display:flex;align-items:center;gap:14px;width:100%}
+.chip-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.chip-name{font-size:14px;font-weight:400;color:var(--text)}
+.chip-service{font-size:11px;color:var(--text2);margin-left:auto;letter-spacing:1px}
+.chip-arrow{font-size:14px;color:var(--text3);margin-left:12px;transition:transform .2s}
+.time-line.has-booking:hover .chip-arrow{transform:translateX(4px);color:var(--gold)}
+.empty-label{font-size:11px;color:var(--text3);letter-spacing:1px}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
+.modal-backdrop.show{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:480px;margin:24px;overflow:hidden;transform:scale(.94) translateY(16px);transition:transform .4s var(--expo)}
+.modal-backdrop.show .modal{transform:scale(1) translateY(0)}
+.modal-header{padding:28px 28px 24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between}
+.modal-title{font-family:var(--font-display);font-size:32px;letter-spacing:3px;color:var(--text)}
+.modal-subtitle{font-size:12px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{border-color:var(--danger);color:var(--danger)}
+.modal-body{padding:28px}
+.modal-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.modal-row:last-child{border-bottom:none}
+.modal-key{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text3)}
+.modal-val{font-size:14px;color:var(--text);text-align:right}
+.modal-val.gold{color:var(--gold);font-size:18px}
+.modal-footer{padding:0 28px 28px;display:flex;gap:12px}
+.modal-cancel-btn{flex:1;padding:14px;border:1px solid var(--border);border-radius:8px;background:none;color:var(--text2);font-family:var(--font);font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.modal-cancel-btn:hover{border-color:var(--border-h);color:var(--text)}
+.delete-btn{flex:1;padding:14px;border:1px solid var(--danger);border-radius:8px;background:var(--danger-dim);color:var(--danger);font-family:var(--font);font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s var(--expo);position:relative;overflow:hidden}
+.delete-btn:hover{background:var(--danger);color:#fff;box-shadow:0 8px 30px rgba(224,83,83,.3)}
+.delete-btn:disabled{opacity:.5;pointer-events:none}
+.delete-btn.confirming{background:var(--danger);color:#fff;animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;animation:fadeUp .5s var(--expo) both}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.gold::before{background:var(--gold)}.stat-card.success::before{background:var(--success)}.stat-card.amber::before{background:var(--amber)}.stat-card.danger::before{background:var(--danger)}
+.stat-num{font-family:var(--font-display);font-size:40px;letter-spacing:2px;margin-bottom:4px}
+.stat-card.gold .stat-num{color:var(--gold)}.stat-card.success .stat-num{color:var(--success)}.stat-card.amber .stat-num{color:var(--amber)}.stat-card.danger .stat-num{color:var(--danger)}
+.stat-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3)}
+
+.blocked-list{display:flex;flex-direction:column;gap:8px}
+.blocked-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px 20px;animation:fadeUp .3s var(--expo) both}
+.blocked-date-text{font-size:14px;color:var(--text)}
+.blocked-date-sub{font-size:11px;color:var(--danger);margin-top:2px;letter-spacing:1px}
+.unblock-btn{padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:none;color:var(--text2);font-family:var(--font);font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.unblock-btn:hover{border-color:var(--success);color:var(--success)}
+.no-items{text-align:center;padding:60px;color:var(--text3);font-size:13px;letter-spacing:1px}
+
+.toast{position:fixed;bottom:28px;right:28px;z-index:9999;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 22px;font-size:13px;transform:translateY(100px);opacity:0;transition:all .4s var(--expo);max-width:320px;display:flex;align-items:center;gap:10px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--success);color:var(--success)}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">CUTS</div>
+    <div class="login-sub">Administration Panel</div>
+    <div class="login-divider"></div>
+    <div class="login-field">
+      <label class="login-label">Username</label>
+      <input class="login-input" id="l-user" type="text" placeholder="ivan / martin" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <input class="login-input" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-hint">Test accounts: ivan / 1234 &nbsp;|&nbsp; martin / 1234</div>
+  </div>
+</div>
+
+<div class="sidebar" id="sidebar" style="display:none">
+  <div class="sb-logo"><div class="sb-logo-text">CUTS</div><div class="sb-logo-sub">Administration</div></div>
+  <div class="sb-barber">
+    <div class="sb-avatar" id="sb-avatar">💈</div>
+    <div><div class="sb-barber-name" id="sb-name">—</div><div class="sb-barber-role">Barber</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-nav-label">Main</div>
+    <div class="sb-item active" onclick="showView('schedule', this)">
+      <span class="sb-icon">📅</span> Schedule
+      <span class="sb-badge" id="badge-count">0</span>
+    </div>
+    <div class="sb-item" onclick="showView('blocked', this)">
+      <span class="sb-icon">🔒</span> Blocked Days
+    </div>
+  </nav>
+  <div class="sb-footer"><button class="logout-btn" onclick="doLogout()">Sign Out</button></div>
+</div>
+
+<div class="main" id="main-area" style="display:none">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">SCHEDULE</div>
+    <div class="topbar-right"><div class="date-pill" id="topbar-date"></div></div>
+  </div>
+
+  <div class="view active" id="view-schedule">
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="schedule-header">
+      <div class="sch-controls">
+        <div class="sch-date-nav">
+          <button class="sch-nav-btn" onclick="schChangeDate(-1)">‹</button>
+          <div class="sch-date-label" id="sch-date-label"></div>
+          <button class="sch-nav-btn" onclick="schChangeDate(1)">›</button>
+        </div>
+      </div>
+      <button class="block-day-btn" id="block-day-btn" onclick="toggleBlockDay()">Block Day</button>
+    </div>
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+  <div class="view" id="view-blocked">
+    <div class="blocked-list" id="blocked-list"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="booking-modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-client-name">—</div>
+        <div class="modal-subtitle" id="modal-service">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row"><span class="modal-key">Date</span><span class="modal-val" id="modal-date">—</span></div>
+      <div class="modal-row"><span class="modal-key">Time</span><span class="modal-val gold" id="modal-time">—</span></div>
+      <div class="modal-row"><span class="modal-key">Phone</span><span class="modal-val" id="modal-phone">—</span></div>
+      <div class="modal-row"><span class="modal-key">Email</span><span class="modal-val" id="modal-email">—</span></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-cancel-btn" onclick="closeModal()">Close</button>
+      <button class="delete-btn" id="delete-btn" onclick="deleteBooking()">Delete Booking</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+
+async function apiFetch(path, options = {}) {
+  try {
+    const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...options });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Server error.' }));
+      throw new Error(err.message || 'Unexpected error.');
+    }
+    if (res.status === 204) return null;
+    return res.json();
+  } catch (e) { showToast(e.message, 'error'); throw e; }
+}
+
+const DAYS     = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS_F = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+let currentBarberId = null;
+let schDate = new Date();
+let selectedBooking = null;
+let deleteStep = 0;
+
+function fmtDate(d) {
+  const dt = typeof d === 'string' ? new Date(d + 'T00:00:00') : d;
+  return DAYS[dt.getDay()] + ', ' + dt.getDate() + ' ' + MONTHS_F[dt.getMonth()] + ' ' + dt.getFullYear();
+}
+function dateKey(d) { return d.toISOString().split('T')[0]; }
+
+function updateTopbarDate() {
+  const now = new Date();
+  document.getElementById('topbar-date').textContent = DAYS[now.getDay()] + ' · ' + now.getDate() + ' ' + MONTHS_S[now.getMonth()] + ' ' + now.getFullYear();
+}
+
+async function doLogin() {
+  const username = document.getElementById('l-user').value.trim();
+  const password = document.getElementById('l-pass').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  btn.classList.add('loading'); btn.textContent = ''; err.textContent = '';
+  try {
+    const data = await apiFetch('/api/admin/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+    currentBarberId = data.barberId;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-area').style.display = 'flex';
+    document.getElementById('sidebar').style.display = 'flex';
+    document.getElementById('sb-name').textContent = data.name;
+    updateTopbarDate();
+    await renderSchedule();
+    await renderStats();
+  } catch (e) {
+    err.textContent = e.message || 'Invalid username or password.';
+    document.getElementById('l-pass').value = '';
+    document.getElementById('l-pass').style.borderColor = 'var(--danger)';
+    setTimeout(() => document.getElementById('l-pass').style.borderColor = '', 1500);
+  } finally {
+    btn.classList.remove('loading'); btn.textContent = 'Sign In';
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin();
+});
+
+function doLogout() {
+  currentBarberId = null;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('main-area').style.display = 'none';
+  document.getElementById('sidebar').style.display = 'none';
+  document.getElementById('l-user').value = '';
+  document.getElementById('l-pass').value = '';
+  schDate = new Date();
+}
+
+function showView(name, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  const titles = { schedule: 'SCHEDULE', blocked: 'BLOCKED DAYS' };
+  document.getElementById('topbar-title').textContent = titles[name] || name.toUpperCase();
+  if (name === 'blocked') renderBlockedList();
+}
+
+function schChangeDate(dir) {
+  schDate.setDate(schDate.getDate() + dir);
+  renderSchedule();
+}
+
+async function renderSchedule() {
+  const key = dateKey(schDate);
+  document.getElementById('sch-date-label').textContent = DAYS[schDate.getDay()] + ', ' + schDate.getDate() + ' ' + MONTHS_S[schDate.getMonth()];
+  const timeline = document.getElementById('timeline');
+  timeline.innerHTML = '<div style="color:var(--text3);padding:20px;font-size:13px">Loading...</div>';
+  try {
+    const slots = await apiFetch(`/api/admin/${currentBarberId}/schedule/${key}`);
+    const isBlocked = slots.every(s => !s.isAvailable && !s.bookingId);
+    const btn = document.getElementById('block-day-btn');
+    btn.textContent = isBlocked ? 'Unblock Day' : 'Block Day';
+    btn.classList.toggle('blocked', isBlocked);
+    timeline.innerHTML = '';
+    slots.forEach((slot, i) => {
+      const t = slot.time.substring(0, 5);
+      const row = document.createElement('div');
+      row.className = 'time-row';
+      row.style.animationDelay = (i * 0.025) + 's';
+      const lineClass = isBlocked ? 'blocked' : (slot.bookingId ? 'has-booking' : '');
+      row.innerHTML = `
+        <div class="time-label">${t}</div>
+        <div class="time-line ${lineClass}" ${slot.bookingId ? `onclick="openBooking(${slot.bookingId})"` : ''}>
+          ${slot.bookingId
+            ? `<div class="booking-chip" id="chip-${slot.bookingId}"><div class="chip-dot"></div><div><div class="chip-name">Loading...</div></div><div class="chip-arrow">→</div></div>`
+            : `<div class="empty-label">${isBlocked ? '' : 'Available'}</div>`}
+        </div>`;
+      timeline.appendChild(row);
+      if (slot.bookingId) loadChipDetails(slot.bookingId);
+    });
+    const todaySlots = await apiFetch(`/api/admin/${currentBarberId}/schedule/${dateKey(new Date())}`);
+    document.getElementById('badge-count').textContent = todaySlots.filter(s => s.bookingId).length;
+  } catch (e) {
+    timeline.innerHTML = '<div style="color:var(--danger);padding:20px">Failed to load schedule.</div>';
+  }
+}
+
+async function loadChipDetails(bookingId) {
+  try {
+    const b = await apiFetch(`/api/admin/bookings/${bookingId}`);
+    const chip = document.getElementById('chip-' + bookingId);
+    if (!chip) return;
+    chip.innerHTML = `<div class="chip-dot"></div><div><div class="chip-name">${b.clientName}</div></div><div class="chip-service">${b.service}</div><div class="chip-arrow">→</div>`;
+  } catch (e) {}
+}
+
+async function renderStats() {
+  try {
+    const todayKey = dateKey(new Date());
+    const [todaySlots, allBookings, blockedDays] = await Promise.all([
+      apiFetch(`/api/admin/${currentBarberId}/schedule/${todayKey}`),
+      apiFetch(`/api/admin/${currentBarberId}/bookings`),
+      apiFetch(`/api/admin/${currentBarberId}/blocked-days`)
+    ]);
+    const todayNum = todaySlots.filter(s => s.bookingId).length;
+    const weekNum  = allBookings.filter(b => { const diff = (new Date(b.date) - new Date()) / 86400000; return diff >= 0 && diff <= 7; }).length;
+    const grid = document.getElementById('stats-grid');
+    [
+      { label: 'Today\'s Bookings', num: todayNum,          type: 'gold'    },
+      { label: 'Total Bookings',    num: allBookings.length, type: 'success' },
+      { label: 'This Week',         num: weekNum,            type: 'amber'   },
+      { label: 'Blocked Days',      num: blockedDays.length, type: 'danger'  }
+    ].forEach((s, i) => {
+      const el = document.createElement('div');
+      el.className = `stat-card ${s.type}`;
+      el.style.animationDelay = (i * 0.1) + 's';
+      el.innerHTML = `<div class="stat-num">${s.num}</div><div class="stat-label">${s.label}</div>`;
+      if (i === 0) grid.innerHTML = '';
+      grid.appendChild(el);
+    });
+  } catch (e) {}
+}
+
+async function openBooking(id) {
+  selectedBooking = null; deleteStep = 0;
+  const btn = document.getElementById('delete-btn');
+  btn.textContent = 'Delete Booking'; btn.classList.remove('confirming'); btn.disabled = false;
+  document.getElementById('booking-modal').classList.add('show');
+  ['modal-client-name','modal-service','modal-date','modal-time','modal-phone','modal-email']
+    .forEach(i => document.getElementById(i).textContent = '—');
+  try {
+    const b = await apiFetch(`/api/admin/bookings/${id}`);
+    selectedBooking = b;
+    document.getElementById('modal-client-name').textContent = b.clientName;
+    document.getElementById('modal-service').textContent     = b.service;
+    document.getElementById('modal-date').textContent        = fmtDate(b.date);
+    document.getElementById('modal-time').textContent        = b.time.substring(0, 5);
+    document.getElementById('modal-phone').textContent       = b.clientPhone;
+    document.getElementById('modal-email').textContent       = b.clientEmail;
+  } catch (e) { document.getElementById('booking-modal').classList.remove('show'); }
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('booking-modal')) return;
+  document.getElementById('booking-modal').classList.remove('show');
+  selectedBooking = null;
+}
+
+async function deleteBooking() {
+  if (!selectedBooking) return;
+  const btn = document.getElementById('delete-btn');
+  if (deleteStep === 0) {
+    deleteStep = 1; btn.textContent = 'Are you sure? Confirm!'; btn.classList.add('confirming'); return;
+  }
+  btn.textContent = 'Deleting...'; btn.disabled = true;
+  try {
+    await apiFetch(`/api/admin/bookings/${selectedBooking.id}`, { method: 'DELETE' });
+    document.getElementById('booking-modal').classList.remove('show');
+    selectedBooking = null;
+    await Promise.all([renderSchedule(), renderStats()]);
+    showToast('Booking deleted. Client has been notified.', 'success');
+  } catch (e) { btn.textContent = 'Delete Booking'; btn.disabled = false; btn.classList.remove('confirming'); deleteStep = 0; }
+}
+
+async function toggleBlockDay() {
+  const key = dateKey(schDate);
+  const isBlocked = document.getElementById('block-day-btn').classList.contains('blocked');
+  try {
+    if (isBlocked) {
+      await apiFetch(`/api/admin/${currentBarberId}/block/${key}`, { method: 'DELETE' });
+      showToast('Day unblocked successfully.', 'success');
+    } else {
+      await apiFetch(`/api/admin/${currentBarberId}/block`, { method: 'POST', body: JSON.stringify({ date: key, reason: null }) });
+      showToast('Day blocked. No slots available.', 'success');
+    }
+    await Promise.all([renderSchedule(), renderStats()]);
+  } catch (e) {}
+}
+
+async function renderBlockedList() {
+  const list = document.getElementById('blocked-list');
+  list.innerHTML = '<div class="no-items">Loading...</div>';
+  try {
+    const days = await apiFetch(`/api/admin/${currentBarberId}/blocked-days`);
+    if (!days.length) { list.innerHTML = '<div class="no-items">No blocked days</div>'; return; }
+    list.innerHTML = days.map((d, i) => `
+      <div class="blocked-item" style="animation-delay:${i*0.06}s">
+        <div>
+          <div class="blocked-date-text">${fmtDate(d.date)}</div>
+          <div class="blocked-date-sub">Blocked — no bookings accepted</div>
+        </div>
+        <button class="unblock-btn" onclick="unblockDay('${d.date}')">Unblock</button>
+      </div>`).join('');
+  } catch (e) { list.innerHTML = '<div class="no-items" style="color:var(--danger)">Failed to load.</div>'; }
+}
+
+async function unblockDay(dateStr) {
+  try {
+    await apiFetch(`/api/admin/${currentBarberId}/block/${dateStr}`, { method: 'DELETE' });
+    showToast('Day unblocked.', 'success');
+    await Promise.all([renderBlockedList(), renderStats()]);
+  } catch (e) {}
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + type;
+  t.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+updateTopbarDate();
+</script>
+</body>
+</html>
