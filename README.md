@@ -1,4 +1,4 @@
-# ✂️ CUTS Barbershop — Online Booking System
+# ✂️ CUTS Barbershop — Booking System
 
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet)
 ![SQLite](https://img.shields.io/badge/Database-SQLite-003B57?style=flat-square&logo=sqlite)
